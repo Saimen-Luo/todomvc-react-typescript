@@ -8,10 +8,9 @@ interface todoItem {
 
 interface Props {
     item: todoItem,
-    index: number,
-    updateComplete: (index: number, checked: boolean) => void,
-    deleteTodo: (index: number) => void,
-    updateTodoContent: (value: string, index: number) => void,
+    updateComplete: (item: todoItem, checked: boolean) => void,
+    deleteTodo: (item: todoItem) => void,
+    updateTodoContent: (value: string, item: todoItem) => void,
 }
 
 interface State {
@@ -26,13 +25,13 @@ class ListItem extends Component<Props, State> {
     }
     // 切换单个todo的完成状态
     toggleCompleted: ((event: React.ChangeEvent<HTMLInputElement>) => void) = (event) => {
-        const {updateComplete, index} = this.props
-        updateComplete(index, event.target.checked)
+        const {updateComplete, item} = this.props
+        updateComplete(item, event.target.checked)
     }
     // 点击删除单个todo
     handleDestroy = () => {
-        const {index, deleteTodo} = this.props
-        deleteTodo(index)
+        const {item, deleteTodo} = this.props
+        deleteTodo(item)
     }
     // 双击切换编辑状态
     toggleEditing = () => {
@@ -61,8 +60,8 @@ class ListItem extends Component<Props, State> {
         if (!contentTrim) { // 为空 删除
             this.handleDestroy()
         } else { // 更新
-            const {index, updateTodoContent} = this.props
-            updateTodoContent(contentTrim, index)
+            const {item, updateTodoContent} = this.props
+            updateTodoContent(contentTrim, item)
         }
 
     }
@@ -86,7 +85,7 @@ class ListItem extends Component<Props, State> {
         if (event.keyCode === 13) {
             this.handleBlur()
         } else if (event.keyCode === 27) { // 按esc退出编辑并恢复数据
-            this.setState({editing:false})
+            this.setState({editing: false})
             this.syncContent()
         }
     }

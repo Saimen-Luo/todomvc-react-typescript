@@ -119,10 +119,10 @@ export default class App extends Component<Props, State> {
         this.localStorageSetItem(newList)
     }
     // 更新单个todo的完成状态，传递给listItem组件
-    updateComplete: (index: number, checked: boolean) => void = (index, checked) => {
+    updateComplete: (item: todoItem, checked: boolean) => void = (item, checked) => {
         const {list} = this.state
-        const newList = list.map((item, i) => {
-            return i === index ? {...item, completed: checked} : item
+        const newList = list.map((i) => {
+            return i.id === item.id ? {...i, completed: checked} : i
         })
         this.setState({list: newList})
         this.localStorageSetItem(newList)
@@ -130,20 +130,20 @@ export default class App extends Component<Props, State> {
         this.queryAllChecked(newList)
     }
     // 删除单个todo
-    deleteTodo: (index: number) => void = (index) => {
+    deleteTodo: (item: todoItem) => void = (item) => {
         const {list} = this.state
-        const newList = list.filter((item, i) => {
-            return index !== i
+        const newList = list.filter((i) => {
+            return item.id !== i.id
         })
         this.setState({list: newList})
         this.localStorageSetItem(newList)
         this.queryAllChecked(newList)
     }
     // 更新单个todo content
-    updateTodoContent: (value: string, index: number) => void = (value, index) => {
+    updateTodoContent: (value: string, item: todoItem) => void = (value, item) => {
         const {list} = this.state
-        const newList = list.map((item, i) => {
-            return index === i ? {...item, content: value} : item
+        const newList = list.map((i) => {
+            return item.id === i.id ? {...i, content: value} : i
         })
         this.setState({list: newList})
         this.localStorageSetItem(newList)
@@ -191,7 +191,6 @@ export default class App extends Component<Props, State> {
                                 <ul className="todo-list">
                                     {filterList.map((item, index) => <ListItem
                                         item={item}
-                                        index={index}
                                         key={item.id}
                                         updateComplete={this.updateComplete}
                                         deleteTodo={this.deleteTodo}
