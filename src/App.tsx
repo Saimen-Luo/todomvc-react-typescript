@@ -57,17 +57,18 @@ export default class App extends Component<Props, State> {
 
     // 受控组件方式收集input value
     handleChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) = (event) => {
-        this.setState({newTodo: event.target.value.trim()});
+        this.setState({newTodo: event.target.value});
     }
     // 回车新建item
     handleEnter: ((event: React.KeyboardEvent<HTMLInputElement>) => void) = (event) => {
         if (event.keyCode === 13) {
             const {list, newTodo} = this.state
             // input value 不为空才创建新item
-            if (newTodo) {
+            const content = newTodo.trim()
+            if (content) {
                 const newList = [...list, {
                     id: list.length ? (list[list.length - 1].id + 1) : 1,
-                    content: newTodo,
+                    content,
                     completed: false
                 }]
                 this.setState({list: newList})
@@ -105,6 +106,14 @@ export default class App extends Component<Props, State> {
         this.setState({list: newList})
         this.queryAllChecked(newList)
     }
+    // 更新单个todo content
+    updateTodoContent: (value: string, index: number) => void = (value, index) => {
+        const {list} = this.state
+        const newList = list.map((item, i) => {
+            return index === i ? {...item, content: value} : item
+        })
+        this.setState({list: newList})
+    }
 
     render() {
         const {list, newTodo, allChecked} = this.state
@@ -132,6 +141,7 @@ export default class App extends Component<Props, State> {
                                         key={item.id}
                                         updateComplete={this.updateComplete}
                                         deleteTodo={this.deleteTodo}
+                                        updateTodoContent={this.updateTodoContent}
                                     />)}
                                 </ul>
                             </section>
