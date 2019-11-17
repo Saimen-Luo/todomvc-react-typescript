@@ -117,6 +117,9 @@ export default class App extends Component<Props, State> {
 
     render() {
         const {list, newTodo, allChecked} = this.state
+        const itemsLeft = list.filter((item) => {
+            return !item.completed
+        })
         return (
             <>
                 <section className="todoapp">
@@ -146,7 +149,8 @@ export default class App extends Component<Props, State> {
                                 </ul>
                             </section>
                             <footer className="footer">
-                                <span className="todo-count"><strong>0</strong> item left</span>
+                                <span
+                                    className="todo-count"><strong>{itemsLeft.length}</strong> {itemsLeft.length === 1 ? 'item' : 'items'} left</span>
                                 <ul className="filters">
                                     <li>
                                         <a className="selected" href="#/">All</a>
