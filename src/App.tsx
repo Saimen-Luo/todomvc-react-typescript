@@ -1,7 +1,10 @@
+/// <reference path='./director.d.ts' />
 // App组件
 import React, {Component} from 'react'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
+import {Router} from "director/build/director.min";
+
 
 import ListItem from './components/listItem';
 
@@ -14,7 +17,8 @@ interface todoItem {
 interface State {
     list: todoItem[],
     newTodo: string,
-    allChecked: boolean
+    allChecked: boolean,
+    currentHash: string
 }
 
 interface Props {
@@ -36,7 +40,8 @@ export default class App extends Component<Props, State> {
             },
         ],
         newTodo: '',
-        allChecked: false
+        allChecked: false,
+        currentHash: '/'
     }
     // DidMount生命周期和所有修改list的情况都有检查allChecked是否满足
     queryAllChecked: (list: todoItem[]) => void = (list) => {
@@ -57,6 +62,21 @@ export default class App extends Component<Props, State> {
         // 从localStorage 读取 list
         const localList = JSON.parse(localStorage.getItem('list') === null ? '[]' : localStorage.getItem('list') as string)
         this.setState({list: localList})
+
+        // router
+        const router = new Router()
+        ;['/', '/active', '/completed'].forEach((item) => {
+            router.on(item, () => {
+                this.setState({currentHash: item})
+            })
+        })
+        router.configure({
+            notfound: () => {
+                window.location.hash = '/'
+                // this.setState({currentHash: '/'}) 这行不需要
+            }
+        })
+        router.init()
     }
 
     // 封装localStorage.setItem()
@@ -139,10 +159,18 @@ export default class App extends Component<Props, State> {
     }
 
     render() {
-        const {list, newTodo, allChecked} = this.state
+        const {list, newTodo, allChecked, currentHash} = this.state
         const itemsLeft = list.filter((item) => {
             return !item.completed
         })
+        let filterList = list
+        if (currentHash === '/active') {
+            filterList = itemsLeft
+        } else if (currentHash === '/completed') {
+            filterList = list.filter((item) => {
+                return item.completed
+            })
+        }
         return (
             <>
                 <section className="todoapp">
@@ -161,7 +189,7 @@ export default class App extends Component<Props, State> {
                                        onChange={this.toggleAll} checked={allChecked}/>
                                 <label htmlFor="toggle-all">Mark all as complete</label>
                                 <ul className="todo-list">
-                                    {list.map((item, index) => <ListItem
+                                    {filterList.map((item, index) => <ListItem
                                         item={item}
                                         index={index}
                                         key={item.id}
@@ -176,13 +204,15 @@ export default class App extends Component<Props, State> {
                                     className="todo-count"><strong>{itemsLeft.length}</strong> {itemsLeft.length === 1 ? 'item' : 'items'} left</span>
                                 <ul className="filters">
                                     <li>
-                                        <a className="selected" href="#/">All</a>
+                                        <a className={currentHash === '/' ? "selected" : undefined} href="#/">All</a>
                                     </li>
                                     <li>
-                                        <a href="#/active">Active</a>
+                                        <a className={currentHash === '/active' ? "selected" : undefined}
+                                           href="#/active">Active</a>
                                     </li>
                                     <li>
-                                        <a href="#/completed">Completed</a>
+                                        <a className={currentHash === '/completed' ? "selected" : undefined}
+                                           href="#/completed">Completed</a>
                                     </li>
                                 </ul>
                                 {list.length === itemsLeft.length ? null :
