@@ -53,6 +53,15 @@ export default class App extends Component<Props, State> {
     componentDidMount(): void {
         const {list} = this.state
         this.queryAllChecked(list)
+
+        // 从localStorage 读取 list
+        const localList = JSON.parse(localStorage.getItem('list') === null ? '[]' : localStorage.getItem('list') as string)
+        this.setState({list: localList})
+    }
+
+    // 封装localStorage.setItem()
+    localStorageSetItem: (list: todoItem[]) => void = (list) => {
+        localStorage.setItem('list', JSON.stringify(list))
     }
 
     // 受控组件方式收集input value
@@ -72,6 +81,7 @@ export default class App extends Component<Props, State> {
                     completed: false
                 }]
                 this.setState({list: newList})
+                this.localStorageSetItem(newList)
                 this.queryAllChecked(newList)
                 // 清空input
                 this.setState({newTodo: ''})
@@ -86,6 +96,7 @@ export default class App extends Component<Props, State> {
             return {...item, completed: event.target.checked}
         })
         this.setState({list: newList})
+        this.localStorageSetItem(newList)
     }
     // 更新单个todo的完成状态，传递给listItem组件
     updateComplete: (index: number, checked: boolean) => void = (index, checked) => {
@@ -94,6 +105,7 @@ export default class App extends Component<Props, State> {
             return i === index ? {...item, completed: checked} : item
         })
         this.setState({list: newList})
+        this.localStorageSetItem(newList)
         // When all the todos are checked it should also get checked.
         this.queryAllChecked(newList)
     }
@@ -104,6 +116,7 @@ export default class App extends Component<Props, State> {
             return index !== i
         })
         this.setState({list: newList})
+        this.localStorageSetItem(newList)
         this.queryAllChecked(newList)
     }
     // 更新单个todo content
@@ -113,6 +126,7 @@ export default class App extends Component<Props, State> {
             return index === i ? {...item, content: value} : item
         })
         this.setState({list: newList})
+        this.localStorageSetItem(newList)
     }
     // clearCompleted
     clearCompleted = () => {
@@ -121,6 +135,7 @@ export default class App extends Component<Props, State> {
             return !item.completed
         })
         this.setState({list: itemsLeft})
+        this.localStorageSetItem(itemsLeft)
     }
 
     render() {
