@@ -114,6 +114,14 @@ export default class App extends Component<Props, State> {
         })
         this.setState({list: newList})
     }
+    // clearCompleted
+    clearCompleted = () => {
+        const {list} = this.state
+        const itemsLeft = list.filter((item) => {
+            return !item.completed
+        })
+        this.setState({list: itemsLeft})
+    }
 
     render() {
         const {list, newTodo, allChecked} = this.state
@@ -162,7 +170,9 @@ export default class App extends Component<Props, State> {
                                         <a href="#/completed">Completed</a>
                                     </li>
                                 </ul>
-                                <button className="clear-completed">Clear completed</button>
+                                {list.length === itemsLeft.length ? null :
+                                    <button className="clear-completed" onClick={this.clearCompleted}>Clear completed
+                                    </button>}
                             </footer>
                         </>
                     ) : null}
